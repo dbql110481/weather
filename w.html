@@ -1,0 +1,125 @@
+<pre class="ce-code-text" spellcheck="false" style="font-family: Consolas, 'liberation mono', Menlo, Courier, monospace; white-space: pre-wrap; width: 1190px; height: 747px; border: 0px; outline: 0px; margin-top: 0px; margin-bottom: 0px; padding: 10px 0px; tab-size: 4;">
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+<style>
+ @import url('https://fonts.googleapis.com/css?family=Anton|PT+Sans');
+ body{
+  background:url('background.jpg') no-repeat center center fixed;
+  background-size:cover;
+ }
+ section{
+  position:relative; 
+ }
+ #w{
+  color:white;
+  font-family: 'PT Sans', sans-serif;
+  text-align:center;
+ }
+ #f{
+  width:800px;
+  margin:0 auto;
+  color:white;
+  font-family: 'PT Sans', sans-serif;
+ }
+ #wf{
+  position:absolute;
+  left:20%;
+ }
+ #m{
+  top:0px;
+  width:200px;
+  height:300px;
+  opacity:0.8;
+  color:white;
+ }
+ #m2{
+  clear:both;
+  position:absolute;
+  right:0px;  
+ }
+ table{
+  width:50px;
+  float:left;
+  color:white;
+  font-family: 'PT Sans', sans-serif;
+ }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maps.google.com/maps/api/js?sensor=false"></script>
+<script>
+var wurl = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22seoul%22)%20%20and%20u%3D%27c%27&format=xml&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys';
+function wdisplay(data){
+ var w = $(data).find('yweather\\:condition, condition');
+ var code = w.attr('code');
+ var date = w.attr('date');
+ var temp = w.attr('temp');
+ var text = w.attr('text');
+ var result = '';
+ result += '<img src="http://l.yimg.com/a/i/us/we/52/'+code+'.gif"/>';
+ result += '<h3>'+date+'</h3>';
+ result += '<h3>'+temp+'</h3>';
+ result += '<h3>'+text+'</h3>';
+ $('#w').html(result);
+};
+function fdisplay(data){
+ var f = $(data).find('yweather\\:forecast, forecast');
+ var result = '';
+ console.log(f);
+ $(f).each(function(index, item){
+  if(index < 7){
+   result += '<table border="1"><tr><td>'+$(item).attr('date')+'</td></tr>';
+   result += '<tr><td>'+$(item).attr('day')+'</td></tr>';
+   result += '<tr><td>'+$(item).attr('high')+'</td></tr>';
+   result += '<tr><td>'+$(item).attr('low')+'</td></tr>';
+   result += '<tr><td><img src="http://l.yimg.com/a/i/us/we/52/'+$(item).attr('code')+'.gif"/></td></tr>';
+   result += '<tr><td>'+$(item).attr('text')+'</td></tr></table>';
+   
+  }
+ });
+ $('#f').html(result);
+};
+function mdisplay(data){
+ var lat = $(data).find('geo\\:lat, lat');
+ var longi = $(data).find('geo\\:long, long');
+ var div = document.querySelector('#m');
+ var center = new google.maps.LatLng($(lat).html(), $(longi).html());
+ var map = new google.maps.Map(div, {
+  mapTypeId:google.maps.MapTypeId.ROADMAP,
+  zoom:15,
+  center:center
+ });
+};
+function getWeather(){
+ $.ajax({
+  url:wurl,
+  success:function(data){
+   fdisplay(data);
+   wdisplay(data);
+   mdisplay(data);
+  },
+  error:function(){
+   alert('error');
+  }
+ });
+};
+$(document).ready(function(){
+ getWeather();
+});
+</script>
+</head>
+<body>
+<section>
+<div id="wm2">
+ <div id="m"></div>
+ <div id="w"></div>
+</div>
+<div id="f">
+ <div id="f"></div>
+</div>
+</section>
+</body>
+</html>
+</pre>
